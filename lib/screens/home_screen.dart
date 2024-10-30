@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/screens/edit_all_product_screen.dart';
 import 'add_product_screen.dart';
 import 'view_records_screen.dart';
+import 'edit_all_product_screen.dart'; // Import your new screen
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -32,6 +34,16 @@ class HomeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => AddProductScreen()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Edit Products'), // New navigation option
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => EditAllProductsScreen()),
                 );
               },
             ),
