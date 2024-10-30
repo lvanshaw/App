@@ -6,7 +6,7 @@ import '../providers/product_provider.dart';
 class EditProductScreen extends StatefulWidget {
   final Product product;
 
-  EditProductScreen({required this.product});
+  const EditProductScreen({super.key, required this.product});
 
   @override
   _EditProductScreenState createState() => _EditProductScreenState();
@@ -14,14 +14,18 @@ class EditProductScreen extends StatefulWidget {
 
 class _EditProductScreenState extends State<EditProductScreen> {
   late TextEditingController nameController;
-  late TextEditingController categoryController;
+  late ProductType selectedType;
+  late String selectedCategory;
   List<WeightPrice> weightPrices = [];
+
+  final List<String> categories = ['Category A', 'Category B', 'Category C'];
 
   @override
   void initState() {
     super.initState();
     nameController = TextEditingController(text: widget.product.name);
-    categoryController = TextEditingController(text: widget.product.category);
+    selectedType = widget.product.type;
+    selectedCategory = widget.product.category;
     weightPrices = widget.product.weightPrices;
   }
 
@@ -49,9 +53,37 @@ class _EditProductScreenState extends State<EditProductScreen> {
               controller: nameController,
               decoration: InputDecoration(labelText: 'Product Name'),
             ),
-            TextField(
-              controller: categoryController,
+            SizedBox(height: 16),
+            DropdownButtonFormField<ProductType>(
+              value: selectedType,
+              decoration: InputDecoration(labelText: 'Type'),
+              items: ProductType.values.map((type) {
+                return DropdownMenuItem<ProductType>(
+                  value: type,
+                  child: Text(type.toString().split('.').last),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedType = value!;
+                });
+              },
+            ),
+            SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: selectedCategory,
               decoration: InputDecoration(labelText: 'Category'),
+              items: categories.map((category) {
+                return DropdownMenuItem<String>(
+                  value: category,
+                  child: Text(category),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedCategory = value!;
+                });
+              },
             ),
             SizedBox(height: 16),
             Text("Weight and Price Details"),
@@ -83,7 +115,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   ),
                 ],
               );
-            }).toList(),
+            }),
             TextButton(
               onPressed: addWeightPriceField,
               child: Text("Add Weight and Price"),
@@ -94,7 +126,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 final updatedProduct = Product(
                   id: widget.product.id,
                   name: nameController.text,
-                  category: categoryController.text,
+                  type: selectedType,
+                  category: selectedCategory,
                   weightPrices: weightPrices,
                 );
 

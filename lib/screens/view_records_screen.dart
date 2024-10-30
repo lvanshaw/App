@@ -4,6 +4,8 @@ import '../providers/product_provider.dart';
 import 'edit_product_screen.dart';
 
 class ViewRecordsScreen extends StatefulWidget {
+  const ViewRecordsScreen({super.key});
+
   @override
   _ViewRecordsScreenState createState() => _ViewRecordsScreenState();
 }

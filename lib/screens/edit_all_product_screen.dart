@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/product_provider.dart'; // Adjust the import path as needed
-import '../models/product.dart'; // Ensure this import is correct for your Product model
+import '../providers/product_provider.dart';
+import '../models/product.dart';
 
 class EditAllProductsScreen extends StatefulWidget {
+  const EditAllProductsScreen({super.key});
+
   @override
   _EditAllProductsScreenState createState() => _EditAllProductsScreenState();
 }
 
 class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
   List<TextEditingController> nameControllers = [];
-  List<TextEditingController> categoryControllers = [];
   List<List<TextEditingController>> weightControllers = [];
   List<List<TextEditingController>> priceControllers = [];
+
+  List<ProductType?> selectedTypes = [];
+  List<String?> selectedCategories = [];
+
+  final List<String> categories = ['Category A', 'Category B', 'Category C'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Edit All Products')),
       body: FutureBuilder(
-        future: Provider.of<ProductProvider>(context, listen: false)
-            .loadProducts(), // Ensure this method exists
+        future:
+            Provider.of<ProductProvider>(context, listen: false).loadProducts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -30,16 +36,18 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
             builder: (context, productProvider, child) {
               final products = productProvider.products;
 
-              // Initialize controllers when products are loaded
               if (nameControllers.isEmpty) {
                 nameControllers = List.generate(
                     products.length,
                     (index) =>
                         TextEditingController(text: products[index].name));
-                categoryControllers = List.generate(
-                    products.length,
-                    (index) =>
-                        TextEditingController(text: products[index].category));
+
+                selectedCategories = List.generate(
+                    products.length, (index) => products[index].category);
+
+                selectedTypes = List.generate(
+                    products.length, (index) => products[index].type);
+
                 weightControllers = List.generate(
                     products.length,
                     (index) => List.generate(
@@ -85,11 +93,40 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
                             ),
                           ),
                           SizedBox(height: 10),
-                          TextField(
-                            controller: categoryControllers[index],
-                            decoration: InputDecoration(
-                              labelText: "Category",
-                            ),
+                          DropdownButtonFormField<String>(
+                            value: selectedCategories[index] ??
+                                categories[0], // Fallback to first category
+                            decoration: InputDecoration(labelText: "Category"),
+                            items: categories.map((category) {
+                              return DropdownMenuItem<String>(
+                                value: category,
+                                child: Text(category),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCategories[index] =
+                                    value!; // No need to check for null here
+                              });
+                            },
+                          ),
+                          SizedBox(height: 10),
+                          DropdownButtonFormField<ProductType>(
+                            value: selectedTypes[index] ??
+                                ProductType.values[0], // Fallback to first type
+                            decoration: InputDecoration(labelText: "Type"),
+                            items: ProductType.values.map((type) {
+                              return DropdownMenuItem<ProductType>(
+                                value: type,
+                                child: Text(type.toString().split('.').last),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedTypes[index] =
+                                    value!; // No need to check for null here
+                              });
+                            },
                           ),
                           SizedBox(height: 10),
                           Text("Weight and Price Details:"),
@@ -116,7 +153,8 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
                                       controller: priceControllers[index]
                                           [weightIndex],
                                       decoration: InputDecoration(
-                                        labelText: "Price (\$)",
+                                        labelText:
+                                            "Price (₹)", // Use ₹ for price
                                       ),
                                       keyboardType: TextInputType.number,
                                     ),
@@ -128,7 +166,6 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
                           SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () {
-                              // Add new weight and price fields
                               setState(() {
                                 weightControllers[index]
                                     .add(TextEditingController());
@@ -148,7 +185,6 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
           );
         },
       ),
-      // Save Changes Button
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           final productProvider =
@@ -158,11 +194,13 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
               index++) {
             final product = productProvider.products[index];
 
-            // Create updated product with new values
             Product updatedProduct = Product(
-              id: product.id, // Assuming you have an id field
+              id: product.id,
               name: nameControllers[index].text,
-              category: categoryControllers[index].text,
+              category:
+                  selectedCategories[index]! ?? '', // Handle null if necessary
+              type: selectedTypes[index]! ??
+                  ProductType.single, // Handle null if necessary
               weightPrices:
                   List.generate(weightControllers[index].length, (weightIndex) {
                 return WeightPrice(
@@ -174,10 +212,9 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
               }),
             );
 
-            // Call your provider method to update the product in the database
             productProvider.updateProduct(updatedProduct);
           }
-          // Optionally show a snackbar or dialog to indicate success
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Products updated successfully!')),
           );
@@ -189,7 +226,6 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
 
   @override
   void dispose() {
-    // Clean up the controllers
     for (var controller in nameControllers) {
       controller.dispose();
     }
@@ -202,9 +238,6 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
       for (var controller in controllerList) {
         controller.dispose();
       }
-    }
-    for (var controller in categoryControllers) {
-      controller.dispose();
     }
     super.dispose();
   }

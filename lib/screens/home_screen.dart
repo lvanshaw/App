@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/screens/delete_products_screen.dart';
+import 'package:myapp/screens/download_from_firebase_screen.dart'; // Import the new screen
 import 'package:myapp/screens/edit_all_product_screen.dart';
+import 'package:myapp/screens/upload_to_firebase_screen.dart';
 import 'add_product_screen.dart';
 import 'view_records_screen.dart';
-import 'edit_all_product_screen.dart'; // Import your new screen
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +51,36 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            // Add more navigation options as needed
+            ListTile(
+              title: Text('Upload to Firebase'), // New navigation option
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => UploadToFirebaseScreen()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Delete Products'), // New navigation option
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DeleteProductsScreen()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('Download Products'), // New navigation option
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DownloadFromFirebaseScreen()),
+                );
+              },
+            ),
           ],
         ),
       ),

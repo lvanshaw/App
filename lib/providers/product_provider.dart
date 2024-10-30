@@ -11,9 +11,13 @@ class ProductProvider with ChangeNotifier {
       _filteredProducts.isNotEmpty ? _filteredProducts : _products;
 
   Future<void> loadProducts() async {
-    _products = await _dbHelper.getProducts();
-    _filteredProducts = _products; // Initially show all products
-    notifyListeners();
+    try {
+      _products = await _dbHelper.getProducts();
+      _filteredProducts = _products; // Initially show all products
+      notifyListeners();
+    } catch (error) {
+      print("Error loading products: $error"); // For debugging
+    }
   }
 
   void filterByCategory(String category) {
@@ -23,6 +27,12 @@ class ProductProvider with ChangeNotifier {
       _filteredProducts =
           _products.where((product) => product.category == category).toList();
     }
+    notifyListeners();
+  }
+
+  void filterByType(ProductType type) {
+    _filteredProducts =
+        _products.where((product) => product.type == type).toList();
     notifyListeners();
   }
 
@@ -39,6 +49,18 @@ class ProductProvider with ChangeNotifier {
 
   void resetProducts() {
     _filteredProducts = List.from(_products); // Reset to all products
+    notifyListeners();
+  }
+
+  Future<void> deleteProduct(int id) async {
+    // Call the database helper to delete the product
+    await _dbHelper.deleteProduct(id);
+
+    // Remove the product from the in-memory list
+    _products.removeWhere((product) => product.id == id);
+    _filteredProducts.removeWhere((product) => product.id == id);
+
+    // Notify listeners about the changes
     notifyListeners();
   }
 
