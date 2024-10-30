@@ -125,6 +125,19 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
                               ),
                             );
                           }),
+                          SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Add new weight and price fields
+                              setState(() {
+                                weightControllers[index]
+                                    .add(TextEditingController());
+                                priceControllers[index]
+                                    .add(TextEditingController());
+                              });
+                            },
+                            child: Text('Add Weight/Price'),
+                          ),
                         ],
                       ),
                     ),
@@ -151,7 +164,7 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
               name: nameControllers[index].text,
               category: categoryControllers[index].text,
               weightPrices:
-                  List.generate(product.weightPrices.length, (weightIndex) {
+                  List.generate(weightControllers[index].length, (weightIndex) {
                 return WeightPrice(
                   weight:
                       double.parse(weightControllers[index][weightIndex].text),
