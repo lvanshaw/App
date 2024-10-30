@@ -40,10 +40,7 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                           fillColor: Colors.white,
                         ),
                         onChanged: (value) {
-                          setState(() {
-                            searchQuery = value;
-                            productProvider.searchByName(searchQuery);
-                          });
+                          productProvider.searchByName(value); // Trigger search
                         },
                       ),
                     ),
@@ -89,17 +86,15 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                                 ),
                                 Text("Category: ${product.category}"),
                                 SizedBox(height: 10),
-                                Text(
-                                  "Weight and Price Details:",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
+                                Text("Weight and Price Details:",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
                                 ...product.weightPrices
                                     .map((weightPrice) => Padding(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 4.0),
                                           child: Text(
-                                            "Weight: ${weightPrice.weight}g - Price: \$${weightPrice.price}",
-                                          ),
+                                              "Weight: ${weightPrice.weight}g - Price: \$${weightPrice.price}"),
                                         )),
                               ],
                             ),

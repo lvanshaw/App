@@ -7,7 +7,8 @@ class ProductProvider with ChangeNotifier {
   List<Product> _filteredProducts = [];
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
-   List<Product> get products => _filteredProducts.isNotEmpty ? _filteredProducts : _products;
+  List<Product> get products =>
+      _filteredProducts.isNotEmpty ? _filteredProducts : _products;
 
   Future<void> loadProducts() async {
     _products = await _dbHelper.getProducts();
@@ -19,17 +20,25 @@ class ProductProvider with ChangeNotifier {
     if (category.isEmpty) {
       _filteredProducts = _products;
     } else {
-      _filteredProducts = _products.where((product) => product.category == category).toList();
+      _filteredProducts =
+          _products.where((product) => product.category == category).toList();
     }
     notifyListeners();
   }
 
   void searchByName(String query) {
     if (query.isEmpty) {
-      _filteredProducts = _products; // Show all if query is empty
+      _filteredProducts = List.from(_products); // Reset to all products
     } else {
-      _filteredProducts = _products.where((product) => product.name.toLowerCase().contains(query.toLowerCase())).toList();
+      _filteredProducts = _products.where((product) {
+        return product.name.toLowerCase().contains(query.toLowerCase());
+      }).toList();
     }
+    notifyListeners();
+  }
+
+  void resetProducts() {
+    _filteredProducts = List.from(_products); // Reset to all products
     notifyListeners();
   }
 
