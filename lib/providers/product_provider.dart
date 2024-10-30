@@ -17,4 +17,9 @@ class ProductProvider with ChangeNotifier {
     await _dbHelper.insertProduct(product);
     await loadProducts();
   }
+
+  Future<void> updateProduct(Product product) async {
+    await _dbHelper.updateProduct(product);
+    await loadProducts(); // Refresh product list
+  }
 }

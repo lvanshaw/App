@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/product_provider.dart';
-import '../models/product.dart';
+import 'edit_product_screen.dart';
 
 class ViewRecordsScreen extends StatelessWidget {
   @override
@@ -29,10 +29,27 @@ class ViewRecordsScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            product.name,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                product.name,
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EditProductScreen(product: product),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                           ),
                           Text("Category: ${product.category}"),
                           SizedBox(height: 10),

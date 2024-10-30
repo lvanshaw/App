@@ -20,7 +20,7 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'grocery_store.db');
     return await openDatabase(
       path,
-      version: 2, // Update version to force onUpgrade
+      version: 2,
       onCreate: (db, version) async {
         await db.execute(
           'CREATE TABLE products(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, category TEXT)',
@@ -30,7 +30,6 @@ class DatabaseHelper {
         );
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        // Add missing table in case it was not created before
         if (oldVersion < 2) {
           await db.execute(
             'CREATE TABLE IF NOT EXISTS weight_prices(id INTEGER PRIMARY KEY AUTOINCREMENT, product_id INTEGER, weight REAL, price REAL, FOREIGN KEY(product_id) REFERENCES products(id) ON DELETE CASCADE)',
@@ -52,6 +51,30 @@ class DatabaseHelper {
       await db.insert(
         'weight_prices',
         {'product_id': productId, 'weight': wp.weight, 'price': wp.price},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+  }
+
+  Future<void> updateProduct(Product product) async {
+    final db = await database;
+
+    await db.update(
+      'products',
+      {'name': product.name, 'category': product.category},
+      where: 'id = ?',
+      whereArgs: [product.id],
+    );
+
+    // Delete old weight and price entries for the product
+    await db.delete('weight_prices',
+        where: 'product_id = ?', whereArgs: [product.id]);
+
+    // Insert updated weight and price entries
+    for (var wp in product.weightPrices) {
+      await db.insert(
+        'weight_prices',
+        {'product_id': product.id, 'weight': wp.weight, 'price': wp.price},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     }
