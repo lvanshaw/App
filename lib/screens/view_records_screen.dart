@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/product_provider.dart';
 import 'edit_product_screen.dart';
+import '../models/product.dart';
 
 class ViewRecordsScreen extends StatefulWidget {
   const ViewRecordsScreen({super.key});
@@ -12,6 +13,7 @@ class ViewRecordsScreen extends StatefulWidget {
 
 class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
   String searchQuery = '';
+  String selectedCategory = 'All'; // Default to 'All'
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,13 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
           return Consumer<ProductProvider>(
             builder: (context, productProvider, child) {
               final products = productProvider.products;
+
+              // Apply category filter
+              final filteredProducts = selectedCategory == 'All'
+                  ? products
+                  : products
+                      .where((product) => product.category == selectedCategory)
+                      .toList();
 
               return SingleChildScrollView(
                 child: Column(
@@ -46,13 +55,35 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                         },
                       ),
                     ),
+                    // Dropdown for category filter
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: DropdownButton<String>(
+                        value: selectedCategory,
+                        isExpanded: true,
+                        items: categories.map((String category) {
+                          return DropdownMenuItem<String>(
+                            value: category,
+                            child: Text(category),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedCategory =
+                                newValue ?? 'All'; // Update selected category
+                            productProvider.filterByCategory(
+                                selectedCategory); // Call filter method
+                          });
+                        },
+                      ),
+                    ),
                     ListView.builder(
-                      itemCount: products.length,
+                      itemCount: filteredProducts.length,
                       shrinkWrap: true, // Avoid overflow
                       physics:
                           NeverScrollableScrollPhysics(), // Disable scrolling in ListView
                       itemBuilder: (context, index) {
-                        final product = products[index];
+                        final product = filteredProducts[index];
                         return Card(
                           margin:
                               EdgeInsets.symmetric(vertical: 8, horizontal: 16),

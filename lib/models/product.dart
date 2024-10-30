@@ -19,7 +19,7 @@ class Product {
       .firstWhere((e) => e.toString().split('.').last == type);
 }
 
-final List<String> categories = ['Fruits', 'Vegetables', 'Dairy', 'Grains'];
+final List<String> categories = ['All','Fruits', 'Vegetables', 'Dairy', 'Grains'];
 
 enum ProductType {
   weight,
