@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => ProductProvider(),
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Grocery Store Management',
         theme: ThemeData(
           primarySwatch: Colors.green,
