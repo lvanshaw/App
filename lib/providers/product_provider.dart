@@ -8,13 +8,13 @@ class ProductProvider with ChangeNotifier {
 
   List<Product> get products => _products;
 
-  Future<void> fetchProducts() async {
+  Future<void> loadProducts() async {
     _products = await _dbHelper.getProducts();
     notifyListeners();
   }
 
   Future<void> addProduct(Product product) async {
     await _dbHelper.insertProduct(product);
-    await fetchProducts();
+    await loadProducts();
   }
 }
