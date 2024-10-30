@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "752351505663",
+    "project_id": "billing-e9747",
+    "storage_bucket": "billing-e9747.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:752351505663:android:5272767174c289fac6b0ca",
+        "android_client_info": {
+          "package_name": "com.ivanshaw.billing"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAK46myeCAK7YGVLByEzWsSziY9zaf6GrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
