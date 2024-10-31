@@ -49,7 +49,7 @@ class _DownloadFromFirebaseScreenState
           //print("Product Key: $productKey");
 
           // Extract and print each product's details
-          productMap.forEach((key, value) {
+          productMap.forEach((key, value) async {
             // Extracting individual product details
             final productData = value as Map<dynamic, dynamic>;
             final productName = productData['name'] ?? 'Unknown';
@@ -84,8 +84,8 @@ class _DownloadFromFirebaseScreenState
             );
 
             // Insert product into local database
-            _dbHelper.deleteAllProducts();
-            _dbHelper.insertProduct(product);
+            await _dbHelper.deleteAllProducts();
+            await _dbHelper.insertProduct(product);
             print("Inserted product: ${product.name}");
           });
         }
