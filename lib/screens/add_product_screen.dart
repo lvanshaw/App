@@ -22,9 +22,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final List<String> categories = ['Fruits', 'Vegetables', 'Dairy', 'Grains'];
 
   void addWeightPrice() {
-    if (priceController.text.isNotEmpty &&
-        (selectedType == ProductType.single ||
-            weightController.text.isNotEmpty)) {
+    if (priceController.text.isNotEmpty) {
       setState(() {
         weightPrices.add(
           WeightPrice(
@@ -82,7 +80,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 });
               },
             ),
-            if (selectedType != ProductType.single)
+            if (selectedType !=
+                ProductType
+                    .single) // Show weight and price fields only for non-single types
               Row(
                 children: [
                   Expanded(
@@ -103,6 +103,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                   ),
                 ],
+              )
+            else // For single type, show only the price input
+              TextField(
+                controller: priceController,
+                decoration: InputDecoration(
+                    labelText: 'Price (₹)'), // Updated to include rupee sign
+                keyboardType: TextInputType.number,
               ),
             IconButton(
               icon: Icon(Icons.add),
