@@ -96,6 +96,16 @@ class DatabaseHelper {
     }
   }
 
+  Future<void> deleteAllProducts() async {
+    final db = await database;
+
+    // First, delete all weight prices associated with products
+    await db.delete('weight_prices');
+
+    // Then, delete all products
+    await db.delete('products');
+  }
+
   Future<void> deleteProduct(int id) async {
     final db = await database;
 
