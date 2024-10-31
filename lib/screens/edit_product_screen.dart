@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/screens/add_product_screen.dart';
 import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../providers/product_provider.dart';
@@ -14,11 +15,9 @@ class EditProductScreen extends StatefulWidget {
 
 class _EditProductScreenState extends State<EditProductScreen> {
   late TextEditingController nameController;
-  late ProductType selectedType;
-  late String selectedCategory;
+  ProductType? selectedType;
+  String? selectedCategory;
   List<WeightPrice> weightPrices = [];
-
-  final List<String> categories = ['Category A', 'Category B', 'Category C'];
 
   @override
   void initState() {
@@ -26,7 +25,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     nameController = TextEditingController(text: widget.product.name);
     selectedType = widget.product.type;
     selectedCategory = widget.product.category;
-    weightPrices = widget.product.weightPrices;
+    weightPrices = List.from(widget.product.weightPrices);
   }
 
   void addWeightPriceField() {
@@ -44,49 +43,85 @@ class _EditProductScreenState extends State<EditProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Product')),
-      body: Padding(
+      appBar: AppBar(
+        title: Text('Edit Product'),
+        backgroundColor: Colors.green[700],
+      ),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Product Name Field
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: 'Product Name'),
+              decoration: InputDecoration(
+                labelText: 'Product Name',
+                prefixIcon: Icon(Icons.edit, color: Colors.green[700]),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
             SizedBox(height: 16),
-            DropdownButtonFormField<ProductType>(
-              value: selectedType,
-              decoration: InputDecoration(labelText: 'Type'),
+
+            // Type Dropdown
+            CustomDropdown<ProductType>(
               items: ProductType.values.map((type) {
                 return DropdownMenuItem<ProductType>(
                   value: type,
-                  child: Text(type.toString().split('.').last),
+                  child: Row(
+                    children: [
+                      Icon(Icons.tag, color: Colors.green[700]),
+                      SizedBox(width: 8),
+                      Text(type.name),
+                    ],
+                  ),
                 );
               }).toList(),
+              value: selectedType,
               onChanged: (value) {
                 setState(() {
-                  selectedType = value!;
+                  selectedType = value;
                 });
               },
+              hint: 'Select Type',
             ),
             SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: selectedCategory,
-              decoration: InputDecoration(labelText: 'Category'),
+
+            // Category Dropdown
+            CustomDropdown<String>(
               items: categories.map((category) {
                 return DropdownMenuItem<String>(
                   value: category,
-                  child: Text(category),
+                  child: Row(
+                    children: [
+                      Icon(Icons.category, color: Colors.green[700]),
+                      SizedBox(width: 8),
+                      Text(category),
+                    ],
+                  ),
                 );
               }).toList(),
+              value: selectedCategory,
               onChanged: (value) {
                 setState(() {
-                  selectedCategory = value!;
+                  selectedCategory = value;
                 });
               },
+              hint: 'Select Category',
             ),
             SizedBox(height: 16),
-            Text("Weight and Price Details"),
+
+            // Weight and Price Section
+            Text(
+              "Weight and Price Details",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+            ),
+            SizedBox(height: 8),
             ...weightPrices.asMap().entries.map((entry) {
               int index = entry.key;
               WeightPrice weightPrice = entry.value;
@@ -94,19 +129,37 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: TextEditingController(
+                          text: weightPrice.weight.toString()),
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: 'Weight (g)'),
+                      decoration: InputDecoration(
+                        labelText: 'Weight (g)',
+                        prefixIcon:
+                            Icon(Icons.balance, color: Colors.green[700]),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                       onChanged: (value) {
                         updateWeightPrice(
                             index, double.parse(value), weightPrice.price);
                       },
                     ),
                   ),
-                  SizedBox(width: 8),
+                  SizedBox(width: 10),
                   Expanded(
                     child: TextField(
+                      controller: TextEditingController(
+                          text: weightPrice.price.toString()),
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(labelText: 'Price (\$)'),
+                      decoration: InputDecoration(
+                        labelText: 'Price (₹)',
+                        prefixIcon:
+                            Icon(Icons.attach_money, color: Colors.green[700]),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
                       onChanged: (value) {
                         updateWeightPrice(
                             index, weightPrice.weight, double.parse(value));
@@ -116,27 +169,49 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ],
               );
             }),
-            TextButton(
+            SizedBox(height: 10),
+            TextButton.icon(
               onPressed: addWeightPriceField,
-              child: Text("Add Weight and Price"),
+              icon: Icon(Icons.add, color: Colors.green[700]),
+              label: Text(
+                "Add Weight and Price",
+                style: TextStyle(color: Colors.green[700]),
+              ),
             ),
             SizedBox(height: 16),
-            ElevatedButton(
+
+            // Save Changes Button
+            ElevatedButton.icon(
               onPressed: () {
-                final updatedProduct = Product(
-                  id: widget.product.id,
-                  name: nameController.text,
-                  type: selectedType,
-                  category: selectedCategory,
-                  weightPrices: weightPrices,
-                );
+                if (selectedCategory != null && selectedType != null) {
+                  final updatedProduct = Product(
+                    id: widget.product.id,
+                    name: nameController.text,
+                    type: selectedType!,
+                    category: selectedCategory!,
+                    weightPrices: weightPrices,
+                  );
 
-                Provider.of<ProductProvider>(context, listen: false)
-                    .updateProduct(updatedProduct);
+                  Provider.of<ProductProvider>(context, listen: false)
+                      .updateProduct(updatedProduct);
 
-                Navigator.pop(context); // Return to the previous screen
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please select both category and type'),
+                    ),
+                  );
+                }
               },
-              child: Text('Save Changes'),
+              icon: Icon(Icons.save, color: Colors.white),
+              label: Text('Save Changes'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green[700],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         ),

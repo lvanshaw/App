@@ -42,7 +42,7 @@ class _DownloadFromFirebaseScreenState
 
       if (productsData != null && productsData.isNotEmpty) {
         for (var entry in productsData.entries) {
-          final productKey = entry.key;
+          //final productKey = entry.key;
           final productMap = entry.value as Map<dynamic, dynamic>;
 
           // Print the product key

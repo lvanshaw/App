@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/product.dart'; // Ensure ProductType is imported from product.dart
+import '../models/product.dart';
 import '../providers/product_provider.dart';
 
 class AddProductScreen extends StatefulWidget {
@@ -39,19 +39,27 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Product')),
+      appBar: AppBar(
+        title: Text('Add Product'),
+        backgroundColor: Colors.teal,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Product Name Field
             TextField(
               controller: nameController,
               decoration: InputDecoration(
                 labelText: 'Product Name',
-                prefixIcon: Icon(Icons.shopping_cart), // Icon for Product Name
+                prefixIcon: Icon(Icons.shopping_cart, color: Colors.teal),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
             SizedBox(height: 16),
+
             // Category Dropdown
             CustomDropdown<String>(
               items: categories.map((category) {
@@ -59,7 +67,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   value: category,
                   child: Row(
                     children: [
-                      Icon(Icons.category), // Icon for category
+                      Icon(Icons.category, color: Colors.teal),
                       SizedBox(width: 8),
                       Text(category),
                     ],
@@ -75,6 +83,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               hint: 'Select Category',
             ),
             SizedBox(height: 16),
+
             // Type Dropdown
             CustomDropdown<ProductType>(
               items: ProductType.values.map((type) {
@@ -82,9 +91,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   value: type,
                   child: Row(
                     children: [
-                      Icon(Icons.tag), // Icon for type
+                      Icon(Icons.tag, color: Colors.teal),
                       SizedBox(width: 8),
-                      Text(type.name), // Access the extension method
+                      Text(type.name),
                     ],
                   ),
                 );
@@ -98,6 +107,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
               hint: 'Select Type',
             ),
             SizedBox(height: 16),
+
+            // Weight and Price Fields
             if (selectedType != ProductType.single)
               Row(
                 children: [
@@ -106,7 +117,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       controller: weightController,
                       decoration: InputDecoration(
                         labelText: 'Weight (g/lt)',
-                        prefixIcon: Icon(Icons.scale), // Icon for weight
+                        prefixIcon: Icon(Icons.scale, color: Colors.teal),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -117,7 +131,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       controller: priceController,
                       decoration: InputDecoration(
                         labelText: 'Price (₹)',
-                        prefixIcon: Icon(Icons.money), // Icon for price
+                        prefixIcon:
+                            Icon(Icons.attach_money, color: Colors.teal),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       keyboardType: TextInputType.number,
                     ),
@@ -129,15 +147,27 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 controller: priceController,
                 decoration: InputDecoration(
                   labelText: 'Price (₹)',
-                  prefixIcon: Icon(Icons.money), // Icon for price
+                  prefixIcon: Icon(Icons.attach_money, color: Colors.teal),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 keyboardType: TextInputType.number,
               ),
             SizedBox(height: 16),
-            IconButton(
-              icon: Icon(Icons.add),
+
+            // Add Weight and Price Button
+            TextButton.icon(
+              icon: Icon(Icons.add, color: Colors.teal),
+              label: Text(
+                'Add Weight and Price',
+                style: TextStyle(color: Colors.teal),
+              ),
               onPressed: addWeightPrice,
             ),
+            SizedBox(height: 8),
+
+            // Display List of Weight and Prices
             ListView.builder(
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -145,13 +175,23 @@ class _AddProductScreenState extends State<AddProductScreen> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(
-                      'Weight: ${weightPrices[index].weight}g, Price: ₹${weightPrices[index].price}'),
+                    'Weight: ${weightPrices[index].weight}g, Price: ₹${weightPrices[index].price}',
+                  ),
                 );
               },
             ),
             SizedBox(height: 16),
+
+            // Save Product Button
             ElevatedButton.icon(
-              // Add icon to the button
+              icon: Icon(Icons.check, color: Colors.white),
+              label: Text('Add Product'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.teal,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
               onPressed: () {
                 if (selectedCategory != null && selectedType != null) {
                   final product = Product(
@@ -163,6 +203,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   Provider.of<ProductProvider>(context, listen: false)
                       .addProduct(product);
                   Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Product added successfully!'),
+                    ),
+                  );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -171,8 +216,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   );
                 }
               },
-              icon: Icon(Icons.check), // Icon for the button
-              label: Text('Add Product'),
             ),
           ],
         ),
@@ -188,12 +231,12 @@ class CustomDropdown<T> extends StatelessWidget {
   final String hint;
 
   const CustomDropdown({
-    Key? key,
+    super.key,
     required this.items,
     this.value,
     required this.onChanged,
     required this.hint,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -206,7 +249,7 @@ class CustomDropdown<T> extends StatelessWidget {
             borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
           builder: (context) {
-            return Container(
+            return SizedBox(
               height: 300,
               child: ListView(
                 children: items.map((item) {
@@ -239,8 +282,10 @@ class CustomDropdown<T> extends StatelessWidget {
           children: [
             Text(
               value != null ? value.toString() : hint,
-              style:
-                  TextStyle(color: value == null ? Colors.grey : Colors.black),
+              style: TextStyle(
+                color: value == null ? Colors.grey : Colors.black,
+                fontWeight: value == null ? FontWeight.w400 : FontWeight.w600,
+              ),
             ),
             Icon(Icons.arrow_drop_down, color: Colors.grey),
           ],

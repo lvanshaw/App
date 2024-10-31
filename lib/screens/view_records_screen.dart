@@ -18,7 +18,12 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('View Records')),
+      appBar: AppBar(
+        title: Text('View Records'),
+        centerTitle: true,
+        backgroundColor: Colors.green[700],
+        elevation: 2,
+      ),
       body: FutureBuilder(
         future:
             Provider.of<ProductProvider>(context, listen: false).loadProducts(),
@@ -45,10 +50,12 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                       child: TextField(
                         decoration: InputDecoration(
                           labelText: 'Search by Product Name',
-                          border: OutlineInputBorder(),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                           prefixIcon: Icon(Icons.search),
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: Colors.grey[100],
                         ),
                         onChanged: (value) {
                           productProvider.searchByName(value); // Trigger search
@@ -58,9 +65,16 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                     // Dropdown for category filter
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: DropdownButton<String>(
+                      child: DropdownButtonFormField<String>(
                         value: selectedCategory,
                         isExpanded: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[100],
+                        ),
                         items: categories.map((String category) {
                           return DropdownMenuItem<String>(
                             value: category,
@@ -77,6 +91,7 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                         },
                       ),
                     ),
+                    const SizedBox(height: 16),
                     ListView.builder(
                       itemCount: filteredProducts.length,
                       shrinkWrap: true, // Avoid overflow
@@ -85,6 +100,10 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                       itemBuilder: (context, index) {
                         final product = filteredProducts[index];
                         return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 3,
                           margin:
                               EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           child: Padding(
@@ -99,11 +118,16 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                                     Text(
                                       product.name,
                                       style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blueGrey[900],
+                                      ),
                                     ),
                                     IconButton(
-                                      icon: Icon(Icons.edit),
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.blueGrey,
+                                      ),
                                       onPressed: () {
                                         Navigator.push(
                                           context,
@@ -117,18 +141,34 @@ class _ViewRecordsScreenState extends State<ViewRecordsScreen> {
                                     ),
                                   ],
                                 ),
-                                Text("Category: ${product.category}"),
-                                SizedBox(height: 10),
-                                Text("Weight and Price Details:",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                ...product.weightPrices
-                                    .map((weightPrice) => Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 4.0),
-                                          child: Text(
-                                              "Weight: ${weightPrice.weight}g - Price: \$${weightPrice.price}"),
-                                        )),
+                                Text(
+                                  "Category: ${product.category}",
+                                  style: TextStyle(
+                                    color: Colors.blueGrey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  "Weight and Price Details:",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueGrey[700],
+                                  ),
+                                ),
+                                ...product.weightPrices.map((weightPrice) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    child: Text(
+                                      "Weight: ${weightPrice.weight}g - Price: ₹${weightPrice.price}",
+                                      style: TextStyle(
+                                        color: Colors.blueGrey[800],
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  );
+                                }),
                               ],
                             ),
                           ),

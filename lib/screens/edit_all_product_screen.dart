@@ -18,12 +18,12 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
   List<ProductType?> selectedTypes = [];
   List<String?> selectedCategories = [];
 
-  final List<String> categories = ['Category A', 'Category B', 'Category C'];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Edit All Products')),
+      appBar: AppBar(
+        title: Text('Edit All Products'),
+      ),
       body: FutureBuilder(
         future:
             Provider.of<ProductProvider>(context, listen: false).loadProducts(),
@@ -106,7 +106,7 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
                             onChanged: (value) {
                               setState(() {
                                 selectedCategories[index] =
-                                    value!; // No need to check for null here
+                                    value; // No need to check for null here
                               });
                             },
                           ),
@@ -124,7 +124,7 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
                             onChanged: (value) {
                               setState(() {
                                 selectedTypes[index] =
-                                    value!; // No need to check for null here
+                                    value; // No need to check for null here
                               });
                             },
                           ),
@@ -198,8 +198,8 @@ class _EditAllProductsScreenState extends State<EditAllProductsScreen> {
               id: product.id,
               name: nameControllers[index].text,
               category:
-                  selectedCategories[index]! ?? '', // Handle null if necessary
-              type: selectedTypes[index]! ??
+                  selectedCategories[index] ?? '', // Handle null if necessary
+              type: selectedTypes[index] ??
                   ProductType.single, // Handle null if necessary
               weightPrices:
                   List.generate(weightControllers[index].length, (weightIndex) {
