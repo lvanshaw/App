@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/product.dart';
+import '../models/product.dart'; // Ensure ProductType is imported from product.dart
 import '../providers/product_provider.dart';
 
 class AddProductScreen extends StatefulWidget {
@@ -18,8 +18,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   String? selectedCategory;
   ProductType? selectedType;
-
-  final List<String> categories = ['Fruits', 'Vegetables', 'Dairy', 'Grains'];
 
   void addWeightPrice() {
     if (priceController.text.isNotEmpty) {
@@ -48,69 +46,94 @@ class _AddProductScreenState extends State<AddProductScreen> {
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: 'Product Name'),
+              decoration: InputDecoration(
+                labelText: 'Product Name',
+                prefixIcon: Icon(Icons.shopping_cart), // Icon for Product Name
+              ),
             ),
-            DropdownButtonFormField<String>(
-              value: selectedCategory,
-              decoration: InputDecoration(labelText: 'Category'),
+            SizedBox(height: 16),
+            // Category Dropdown
+            CustomDropdown<String>(
               items: categories.map((category) {
                 return DropdownMenuItem<String>(
                   value: category,
-                  child: Text(category),
+                  child: Row(
+                    children: [
+                      Icon(Icons.category), // Icon for category
+                      SizedBox(width: 8),
+                      Text(category),
+                    ],
+                  ),
                 );
               }).toList(),
+              value: selectedCategory,
               onChanged: (value) {
                 setState(() {
                   selectedCategory = value;
                 });
               },
+              hint: 'Select Category',
             ),
-            DropdownButtonFormField<ProductType>(
-              value: selectedType,
-              decoration: InputDecoration(labelText: 'Type'),
+            SizedBox(height: 16),
+            // Type Dropdown
+            CustomDropdown<ProductType>(
               items: ProductType.values.map((type) {
                 return DropdownMenuItem<ProductType>(
                   value: type,
-                  child: Text(type.toString().split('.').last),
+                  child: Row(
+                    children: [
+                      Icon(Icons.tag), // Icon for type
+                      SizedBox(width: 8),
+                      Text(type.name), // Access the extension method
+                    ],
+                  ),
                 );
               }).toList(),
+              value: selectedType,
               onChanged: (value) {
                 setState(() {
                   selectedType = value;
                 });
               },
+              hint: 'Select Type',
             ),
-            if (selectedType !=
-                ProductType
-                    .single) // Show weight and price fields only for non-single types
+            SizedBox(height: 16),
+            if (selectedType != ProductType.single)
               Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: weightController,
-                      decoration: InputDecoration(labelText: 'Weight (g/lt)'),
+                      decoration: InputDecoration(
+                        labelText: 'Weight (g/lt)',
+                        prefixIcon: Icon(Icons.scale), // Icon for weight
+                      ),
                       keyboardType: TextInputType.number,
                     ),
                   ),
-                  SizedBox(width: 8), // Add space between weight and price
+                  SizedBox(width: 8),
                   Expanded(
                     child: TextField(
                       controller: priceController,
                       decoration: InputDecoration(
-                          labelText:
-                              'Price (₹)'), // Updated to include rupee sign
+                        labelText: 'Price (₹)',
+                        prefixIcon: Icon(Icons.money), // Icon for price
+                      ),
                       keyboardType: TextInputType.number,
                     ),
                   ),
                 ],
               )
-            else // For single type, show only the price input
+            else
               TextField(
                 controller: priceController,
                 decoration: InputDecoration(
-                    labelText: 'Price (₹)'), // Updated to include rupee sign
+                  labelText: 'Price (₹)',
+                  prefixIcon: Icon(Icons.money), // Icon for price
+                ),
                 keyboardType: TextInputType.number,
               ),
+            SizedBox(height: 16),
             IconButton(
               icon: Icon(Icons.add),
               onPressed: addWeightPrice,
@@ -122,11 +145,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(
-                      'Weight: ${weightPrices[index].weight}g, Price: ₹${weightPrices[index].price}'), // Updated to include rupee sign
+                      'Weight: ${weightPrices[index].weight}g, Price: ₹${weightPrices[index].price}'),
                 );
               },
             ),
-            ElevatedButton(
+            SizedBox(height: 16),
+            ElevatedButton.icon(
+              // Add icon to the button
               onPressed: () {
                 if (selectedCategory != null && selectedType != null) {
                   final product = Product(
@@ -139,7 +164,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       .addProduct(product);
                   Navigator.pop(context);
                 } else {
-                  // Show error if category or type not selected
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('Please select both category and type'),
@@ -147,8 +171,78 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   );
                 }
               },
-              child: Text('Add Product'),
+              icon: Icon(Icons.check), // Icon for the button
+              label: Text('Add Product'),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomDropdown<T> extends StatelessWidget {
+  final List<DropdownMenuItem<T>> items;
+  final T? value;
+  final ValueChanged<T?> onChanged;
+  final String hint;
+
+  const CustomDropdown({
+    Key? key,
+    required this.items,
+    this.value,
+    required this.onChanged,
+    required this.hint,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          builder: (context) {
+            return Container(
+              height: 300,
+              child: ListView(
+                children: items.map((item) {
+                  return InkWell(
+                    onTap: () {
+                      onChanged(item.value);
+                      Navigator.pop(context);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 24.0),
+                      child: item.child,
+                    ),
+                  );
+                }).toList(),
+              ),
+            );
+          },
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              value != null ? value.toString() : hint,
+              style:
+                  TextStyle(color: value == null ? Colors.grey : Colors.black),
+            ),
+            Icon(Icons.arrow_drop_down, color: Colors.grey),
           ],
         ),
       ),

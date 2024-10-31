@@ -42,16 +42,37 @@ class Product {
 
 final List<String> categories = [
   'All',
-  'Fruits',
   'Vegetables',
   'Dairy',
-  'Grains'
+  'Grains',
+  'Spices',
+  'Snacks',
+  'Masala Powder',
+  'Oil',
+  'Flour',
+  'Other',
+  'Stationery'
 ];
 
 enum ProductType {
   weight,
   pocket,
   single,
+}
+
+extension ProductTypeExtension on ProductType {
+  String get name {
+    switch (this) {
+      case ProductType.weight:
+        return 'Weight';
+      case ProductType.pocket:
+        return 'Pocket';
+      case ProductType.single:
+        return 'Single';
+      default:
+        return '';
+    }
+  }
 }
 
 class WeightPrice {

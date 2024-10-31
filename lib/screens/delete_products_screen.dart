@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/product_provider.dart';
 
 class DeleteProductsScreen extends StatefulWidget {
-  const DeleteProductsScreen({Key? key}) : super(key: key);
+  const DeleteProductsScreen({super.key});
 
   @override
   _DeleteProductsScreenState createState() => _DeleteProductsScreenState();
