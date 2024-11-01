@@ -123,50 +123,69 @@ class _BillingScreenState extends State<BillingScreen> {
   void showWeightSelectionDialog(Product product) {
     final TextEditingController quantityController =
         TextEditingController(text: '1'); // Default quantity is 1
+    final TextEditingController weightController =
+        TextEditingController(); // For custom weight input
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text('Select Weight for ${product.name}'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: [
-                // Weight and price selection
-                Column(
-                  children: product.weightPrices.map((weightPrice) {
-                    return ListTile(
-                      title: Text(
-                          "Weight: ${weightPrice.weight}g - Price: ₹${weightPrice.price}"),
-                      onTap: () {
-                        int quantity = int.tryParse(quantityController.text) ??
-                            1; // Get quantity
-                        setState(() {
-                          billingItems.add(BillingItem(
-                            product: product,
-                            weight: weightPrice.weight,
-                            totalPrice: weightPrice.price *
-                                quantity, // Calculate total price based on quantity
-                          ));
-                        });
-                        Navigator.of(context)
-                            .pop(); // Close the dialog after adding
-                      },
-                    );
-                  }).toList(),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
+                child: ListBody(
+                  children: [
+                    // Weight and price selection
+                    Column(
+                      children: product.weightPrices.map((weightPrice) {
+                        return ListTile(
+                          title: Text(
+                              "Weight: ${weightPrice.weight}g - Price: ₹${weightPrice.price}"),
+                          onTap: () {
+                            int quantity =
+                                int.tryParse(quantityController.text) ??
+                                    1; // Get quantity
+                            setState(() {
+                              billingItems.add(BillingItem(
+                                product: product,
+                                weight: weightPrice.weight,
+                                totalPrice: weightPrice.price *
+                                    quantity, // Calculate total price based on quantity
+                              ));
+                            });
+                            Navigator.of(context)
+                                .pop(); // Close the dialog after adding
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    // Custom weight input only if product type is not 'single'
+                    if (product.type != ProductType.single) ...[
+                      TextField(
+                        controller: weightController,
+                        decoration: const InputDecoration(
+                          labelText: 'Custom Weight (g)',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    // Quantity input
+                    TextField(
+                      controller: quantityController,
+                      decoration: const InputDecoration(
+                        labelText: 'Quantity',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-                // Quantity input
-                TextField(
-                  controller: quantityController,
-                  decoration: const InputDecoration(
-                    labelText: 'Quantity',
-                    border: OutlineInputBorder(),
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
-            ),
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -177,10 +196,30 @@ class _BillingScreenState extends State<BillingScreen> {
             ),
             TextButton(
               onPressed: () {
-                // Optionally you could have an "OK" button to confirm selection
-                Navigator.of(context).pop(); // Close the dialog without changes
+                // Calculate price based on custom weight
+                double? customWeight = double.tryParse(weightController.text);
+                if (customWeight != null) {
+                  // Find the price for the custom weight
+                  final weightPrice = product.weightPrices.firstWhere(
+                    (wp) => wp.weight == customWeight,
+                    orElse: () => WeightPrice(weight: customWeight, price: 0),
+                  );
+                  int quantity = int.tryParse(quantityController.text) ??
+                      1; // Get quantity
+                  double totalPrice = weightPrice.price * quantity;
+
+                  // Add the custom weight billing item
+                  setState(() {
+                    billingItems.add(BillingItem(
+                      product: product,
+                      weight: customWeight,
+                      totalPrice: totalPrice,
+                    ));
+                  });
+                }
+                Navigator.of(context).pop(); // Close the dialog after adding
               },
-              child: const Text('OK'),
+              child: const Text('Add Custom Weight'),
             ),
           ],
         );
