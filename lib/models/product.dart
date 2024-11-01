@@ -51,7 +51,8 @@ final List<String> categories = [
   'Oil',
   'Flour',
   'Other',
-  'Stationery'
+  'Stationery',
+  'Pulses'
 ];
 
 enum ProductType {
